@@ -8,7 +8,7 @@
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-<nav><b>NAGPUR ENFIELD RIDERS</b><a href="#compass">Zero Mile</a><a href="#rides">Rides</a><a href="#gallery">Reel</a><a href="#licence">Licence</a><a href="#plates">Riders</a><a href="#shop">Garage</a></nav>
+<nav><b>NAGPUR ENFIELD RIDERS</b><a href="#compass">Zero Mile</a><a href="#rides">Rides</a><a href="#gallery">Reel</a><a href="#licence">Join</a><a href="#plates">Riders</a><a href="#shop">Garage</a></nav>
 
 <header class="hero" id="hero">
 <div class="road"></div><div class="beam"></div>
@@ -17,7 +17,7 @@
 <h1>ZERO MILE<br>RIDERS</h1>
 <p>Every road in India is measured from the stone that stands in our city. We are the ones who ride outward from it.</p>
 <p><a class="btn" href="#licence">Get your Riding Licence</a> &nbsp; <a class="btn g" href="#compass">Choose your road</a></p>
-<div class="tach" id="tach"><svg viewBox="0 0 150 150"><circle class="ring" cx="75" cy="75" r="68" fill="#0b0908" stroke="#d6ad57" stroke-width="3"/><g id="tk" stroke="#d6ad57" stroke-width="2"></g><g id="nd"><line x1="75" y1="75" x2="75" y2="22" stroke="#ff6a13" stroke-width="3" stroke-linecap="round"/></g><circle cx="75" cy="75" r="7" fill="#d6ad57"/><text x="75" y="118" text-anchor="middle" fill="#9d9080" font-size="10" letter-spacing="3" font-family="Cinzel">THUMP</text></svg></div>
+<div class="tach" id="tach"><svg viewBox="0 0 150 150"><circle class="ring" cx="75" cy="75" r="68" fill="#0b0908" stroke="#d6ad57" stroke-width="3"/><g id="tk" stroke="#d6ad57" stroke-width="2"></g><g id="nd"><line x1="75" y1="75" x2="75" y2="22" stroke="#ff6a13" stroke-width="3" stroke-linecap="round"/></g><circle cx="75" cy="75" r="7" fill="#d6ad57"/><text x="75" y="118" text-anchor="middle" fill="#9d9080" font-size="10" letter-spacing="3" font-family="Cinzel">RPM</text></svg></div>
 </div>
 </header>
 
@@ -31,18 +31,17 @@
 <section id="gallery" class="rv"><span class="k">The Reel</span><h2>Ride Gallery</h2><div class="film" id="film"></div>
 <p class="sub" style="font-size:14px">Placeholders. Use only photos you own. Instagram: <a href="https://instagram.com/nagpur_enfield_riders" target="_blank" rel="noopener" style="color:var(--br)">@nagpur_enfield_riders</a>. A live feed needs a server or embed service.</p></section>
 
-<section id="licence" class="rv"><span class="k">Membership</span><h2>Your Riding Licence</h2><p class="sub">Type your name and watch your licence appear.</p>
-<div class="licw"><div class="lic"><div class="t">NAGPUR ENFIELD RIDERS · ZERO MILE LICENCE</div><div class="n" id="ln">YOUR NAME</div><div style="margin-top:6px;font-weight:700" id="lb">YOUR BIKE</div><div class="r"><span id="lno">NER-MH31-0000</span><span id="lt">RIDER</span></div></div>
-<div><input id="in" placeholder="Full name"><input id="ib" placeholder="Your bike (e.g. 350 cc cruiser)"><input placeholder="WhatsApp number">
-<div class="tiers" id="tiers"></div><p style="margin-top:16px"><button class="btn" onclick="pay('Membership: '+tier[0],tier[1])">Claim licence</button></p></div></div></section>
+<section id="licence" class="rv"><span class="k">Join Our Community</span><h2>Your Riding Licence</h2><p class="sub">Fill in your details. Your licence appears instantly and your request is sent to our admin on WhatsApp.</p>
+<div class="licw"><div class="lic"><div class="t">NAGPUR ENFIELD RIDERS · ZERO MILE LICENCE</div><div class="n" id="ln">YOUR NAME</div><div style="margin-top:6px;font-weight:700" id="lb">YOUR BIKE</div><div style="font-weight:700;opacity:.75;margin-top:2px" id="lp">PROFESSION</div><div class="r"><span id="lno">+91 XXXXXXXXXX</span><span id="lt">RIDER</span></div></div>
+<form id="jf" novalidate><input id="in" placeholder="Full name" autocomplete="name"><div class="wa"><span>+91</span><input id="ph" type="tel" inputmode="numeric" maxlength="10" placeholder="10-digit WhatsApp number" autocomplete="tel-national"></div><input id="pf" placeholder="Profession (e.g. Engineer, Doctor)"><select id="bike"></select><input id="bn" placeholder="Bike registration number (e.g. MH 31 AB 1234)" maxlength="13"><div class="tiers" id="tiers"></div><p id="je" style="color:var(--em);margin:10px 0 0;min-height:22px"></p><button class="btn" type="submit">Join &amp; send on WhatsApp</button></form></div></section>
 
-<section id="plates" class="rv"><span class="k">Number plates</span><h2>Riders Directory</h2><input id="q" placeholder="Search name, bike or area" style="max-width:380px;margin-top:16px"><div class="pl" id="pl"></div><p class="sub" style="font-size:14px">Sample members. List only riders who agreed to be shown.</p></section>
+<section id="plates" class="rv"><span class="k">Number plates</span><h2>Riders Directory</h2><input id="q" placeholder="Search name, bike or area" style="max-width:380px;margin-top:16px"><div class="pl" id="pl"></div><p class="sub" style="font-size:14px">Sample riders and bike numbers. Add real members only with their consent.</p></section>
 
-<section id="shop" class="rv"><span class="k">The Garage</span><h2>Rider Merchandise</h2><p class="sub">Our own designs only. No Royal Enfield logos.</p><div class="sh" id="sh"></div></section>
+<section id="shop" class="rv"><span class="k">The Garage</span><h2>Rider Merchandise</h2><p class="sub">Our own designs only. Tap Order and your request goes to our admin on WhatsApp.</p><div class="sh" id="sh"></div></section>
 
-<button class="snd" id="snd">🔊 Hear the thump</button>
-<button class="cart" onclick="oc()">CART (<span id="cc">0</span>)</button>
-<dialog id="dl"><h3>Your cart</h3><div id="cl"></div><p><b>Total ₹<span id="ct">0</span></b></p><button class="btn" onclick="pay('Cart',tot())">Pay by UPI / Card</button> <button class="btn g" onclick="dl.close()">Close</button></dialog>
+<div class="sw"><button class="snd" id="snd">🔥 Start the engine</button><button class="snd" id="rev">⚡ Hold to rev</button></div>
+<dialog id="rd"><form id="rf" novalidate><h3 id="rt" style="color:var(--br);margin-bottom:4px">Ride</h3><p id="rs" style="color:var(--mu);margin:0 0 12px"></p><input id="rn" placeholder="Rider name"><div class="wa"><span>+91</span><input id="rp" type="tel" inputmode="numeric" maxlength="10" placeholder="10-digit WhatsApp number"></div><select id="rb"></select><input id="rv" placeholder="Bike registration number (e.g. MH 31 AB 1234)" maxlength="13"><label>Riders on this ride (with pillion)</label><input id="rq" type="number" min="1" max="10" value="1"><input id="rc" placeholder="Note (optional)"><p id="re" style="color:var(--em);min-height:22px;margin:4px 0"></p><button class="btn" type="submit">Register on WhatsApp</button> <button class="btn g" type="button" onclick="rd.close()">Cancel</button></form></dialog>
+<dialog id="od"><form id="of" novalidate><h3 id="oi" style="color:var(--br);margin-bottom:12px">Item</h3><label>Quantity</label><input id="oq" type="number" min="1" max="50" value="1"><div id="osw"><label>Size</label><select id="os"><option>S</option><option>M</option><option selected>L</option><option>XL</option><option>XXL</option></select></div><input id="on" placeholder="Rider name"><div class="wa"><span>+91</span><input id="op" type="tel" inputmode="numeric" maxlength="10" placeholder="10-digit WhatsApp number"></div><input id="oc" placeholder="Note (optional)"><p id="oe" style="color:var(--em);min-height:22px;margin:4px 0"></p><button class="btn" type="submit">Send order on WhatsApp</button> <button class="btn g" type="button" onclick="od.close()">Cancel</button></form></dialog>
 
 <footer><h3 style="color:var(--br)">NAGPUR ENFIELD RIDERS</h3>
 <div class="dc"><b>Disclaimer:</b> Nagpur Enfield Riders is an independent motorcycle riders community and is not affiliated with, sponsored by, or endorsed by Royal Enfield or Eicher Motors Limited. Royal Enfield is a trademark of its respective owner. We do not sell products bearing Royal Enfield logos.</div>
