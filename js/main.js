@@ -1,6 +1,6 @@
 const $ = i => document.getElementById(i);
 const WA = '919028267858';
-const SHEET_URL = 'https://docs.google.com/spreadsheets/d/12bQwYDuYjBnRultp3JnHDaVY11yl_kZg5eR86XKSdQM'; /* paste your Google Apps Script Web app URL here (see google-sheet/SETUP.txt) */
+const SHEET_URL = 'https://script.google.com/macros/s/AKfycbzna5UWNdrE5iu-HEOnzhHG0pQh63gtkDrl3z3QzwWo2g1666OWUMvTtDvvuVSAoovq-w/exec'; /* paste your Google Apps Script Web app URL here (see google-sheet/SETUP.txt) */
 const logSheet = o => { if (!SHEET_URL) return; try { fetch(SHEET_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(o) }).catch(() => { }) } catch (e) { } };
 const send = m => window.open('https://wa.me/' + WA + '?text=' + encodeURIComponent(m), '_blank');
 const dg = v => v.replace(/\D/g, '').slice(0, 10), okP = v => /^[6-9]\d{9}$/.test(v);
