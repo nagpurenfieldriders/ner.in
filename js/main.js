@@ -25,7 +25,7 @@ renderRides();
 /* Upcoming rides come ONLY from the "Upcoming Rides" tab of the Google Sheet */
 const RIDES_TAB = 'Upcoming Rides';
 const pd = s => { const x = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(s).trim()); return x ? new Date(+x[1], +x[2] - 1, +x[3]) : new Date(s) };
-if (SHEET_URL) fetch(SHEET_URL + '?tab=' + encodeURIComponent(RIDES_TAB), { cache: 'no-store' }).then(r => r.json()).then(j => {
+if (SHEET_URL) fetch(SHEET_URL + '?a=rides&tab=' + encodeURIComponent(RIDES_TAB), { cache: 'no-store' }).then(r => r.json()).then(j => {
     if (!j || !j.ok || !Array.isArray(j.rides)) { console.warn('NER: Apps Script is an old version (no rides support). Paste the latest Code.gs and deploy a New version.', j); loadState = 0; renderRides(); return }
     console.info('NER: rides loaded from tab "' + j.tab + '" (' + j.rides.length + ' rows)');
     const M = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'], t0 = new Date(); t0.setHours(0, 0, 0, 0);
