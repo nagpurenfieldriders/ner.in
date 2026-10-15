@@ -6,7 +6,7 @@ const dg=v=>v.replace(/\D/g,'').slice(0,10),okP=v=>/^[6-9]\d{9}$/.test(v);
 const vn=v=>v.toUpperCase().replace(/[^A-Z0-9 ]/g,'').slice(0,13);
 const inr=n=>'₹'+Number(n).toLocaleString('en-IN');
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const feeOf=s=>{if(s===undefined||s===null)return null;s=String(s).trim();if(!s)return null;if(/^(free|nil|-|na|n\/a)$/i.test(s))return 0;const n=parseInt(s.replace(/[^\d]/g,''));return isNaN(n)?null:n};
+const feeOf=s=>{if(s===undefined||s===null)return null;if(typeof s==='number')return Number.isFinite(s)?s:null;s=String(s).trim();if(!s)return null;if(/^(free|nil|\-|na|n\/a)$/i.test(s))return 0;const m=s.replace(/,/g,'').match(/-?\d+(?:\.\d+)?/);if(!m)return null;const n=Number(m[0]);return Number.isFinite(n)?Math.round(n):null};
 const goWA=m=>{location.href='https://wa.me/'+WA+'?text='+encodeURIComponent(m)};
 const logSheet=o=>{if(!SHEET_URL)return Promise.resolve();return Promise.race([fetch(SHEET_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(o)}).catch(()=>0),new Promise(r=>setTimeout(r,25000))])};
 const sentMsg={};
@@ -35,7 +35,7 @@ cs.querySelectorAll('.node').forEach(n=>{const f=()=>{const d=DEST[n.dataset.i];
 /* ---------- Upcoming rides (sample list is used only when no sheet is connected) ---------- */
 let RIDES=[["12","NOV","Sunday Dawn Run","NAGPUR → RAMTEK","60 km · Easy",250,"Breakfast"],["29","NOV","Pench Jungle Ride","NAGPUR → PENCH","90 km · Moderate",600,"Breakfast + Lunch"],["20","DEC","Winter Tour","NAGPUR → TADOBA","150 km · Moderate",0,""]];
 let loadState=SHEET_URL?1:0;if(SHEET_URL)RIDES=[];
-const feeTxt=r=>r[5]===null?'<p class="fee">Fee: to be confirmed</p>':r[5]>0?`<p class="fee">Fee ${inr(r[5])} per rider${r[6]?' · '+esc(r[6]):''}</p>`:'<p class="fee free">Free ride</p>';
+const feeTxt=r=>r[5]===null?'<p class="fee">Fee: to be confirmed</p>':r[5]>0?`<p class="fee">Fee ${inr(r[5])} per rider${r[6]?' · '+esc(r[6]):''}</p>`:r[5]===0?'<p class="fee free">Free ride</p>':'<p class="fee">Fee: to be confirmed</p>';
 function renderRides(){$('tix').innerHTML=RIDES.length?RIDES.map((r,i)=>`<div class="tk"><div class="m"><small>Boarding pass · Gate: Zero Mile</small><h3>${esc(r[2])}</h3><div class="route">${esc(r[3])}</div><p style="color:var(--mu);margin:6px 0 4px">${esc(r[4])}</p>${feeTxt(r)}<br><button class="btn g" style="padding:10px 18px" onclick="openRide(${i})">Register for ride</button></div><div class="s"><div><b>${esc(r[0])}</b><br><small>${esc(r[1])}</small></div></div></div>`).join(''):'<p class="sub">'+(loadState?'Loading upcoming rides…':'No upcoming rides announced yet. Check back soon.')+'</p>'}
 renderRides();
 const pd=s=>{const x=/^(\d{4})-(\d{2})-(\d{2})$/.exec(String(s).trim());return x?new Date(+x[1],+x[2]-1,+x[3]):new Date(s)};
@@ -86,15 +86,15 @@ $('jf').onsubmit=e=>{e.preventDefault();const n=$('in').value.trim(),p=$('ph').v
  `*New rider join request - Nagpur Enfield Riders*\nName: ${n}\nWhatsApp: +91${p}\nEmail: ${em}\nDate of birth: ${db}\nProfession: ${$('pf').value.trim()||'-'}\nBike: ${$('bike').value||'-'}\nBike number: ${$('bn').value||'-'}\nMembership: ${tier.n} - ${tier.typ} (${inr(tier.fee)})${tier.fee>0?'\nPlease share the payment details. I will send my payment screenshot in this chat.':''}`)};
 
 /* ---------- Riders directory: from the Riders tab, only riders marked "Show on website" = Yes (max 10 per search) ---------- */
-const R=[{name:"Amit Deshmukh",profession:"Engineer",bike:"Classic 350",bikeNo:"MH 31 XX 0001"},{name:"Rohan Meshram",profession:"Doctor",bike:"Himalayan 450",bikeNo:"MH 31 XX 0002"},{name:"Sneha Patil",profession:"Designer",bike:"Meteor 350",bikeNo:"MH 31 XX 0003"},{name:"Vikram Thakur",profession:"Business owner",bike:"Interceptor 650",bikeNo:"MH 31 XX 0004"}];
+const R=[];
 const card=r=>`<div class="rc"><div class="plate"><i>IND</i><div><b>${esc(r.bikeNo||'—')}</b><span>${esc(r.name)}${r.profession?' · '+esc(r.profession):''}<br>${esc(r.bike||'')}</span></div></div>${r.phone?`<div class="ct"><a class="btn sm" href="tel:${r.phone}">Call</a><a class="btn g sm" href="https://wa.me/${r.phone.replace('+','')}" target="_blank" rel="noopener">WhatsApp</a></div>`:''}</div>`;
 const showRiders=(l,m)=>{$('pl').innerHTML=l.length?l.map(card).join(''):'<p class="sub">'+m+'</p>'};
 let dtok=0,dtm;
 function dp(){const q=$('q').value.trim();
- if(!SHEET_URL){const l=q.toLowerCase();showRiders(R.filter(r=>[r.name,r.profession,r.bike,r.bikeNo].join(' ').toLowerCase().includes(l)),'No riders found.');$('dn').textContent='Sample riders. Connect the sheet to show your real riders.';return}
- if(q.length===1)return;const t=++dtok;$('dn').textContent='Loading…';
+ if(!SHEET_URL){showRiders([],'Rider directory is not connected.');$('dn').textContent='';return}
+ const t=++dtok;$('dn').textContent='Loading…';
  fetch(SHEET_URL+'?a=riders&q='+encodeURIComponent(q),{cache:'no-store'}).then(r=>r.json()).then(j=>{if(t!==dtok)return;if(!j||!j.ok||!Array.isArray(j.riders)){showRiders([],'The riders list is not available right now.');$('dn').textContent='';return}
-  showRiders(j.riders,q?'No listed rider matches your search.':'No riders listed yet.');$('dn').textContent=q?'Showing up to 10 matching riders.':'Showing up to 10 riders. Search by name, bike, bike number or phone to find others.'}).catch(()=>{if(t===dtok){showRiders([],'Could not load riders. Please try again.');$('dn').textContent=''}})}
+  showRiders(j.riders,q?'No listed rider matches your search.':'No riders marked “Show on website” yet.');$('dn').textContent=q?'Showing up to 10 matching riders.':'Showing the first 10 riders marked Yes in the Riders sheet. Search by name, bike, bike number or phone to find others.'}).catch(()=>{if(t===dtok){showRiders([],'Could not load riders. Please try again.');$('dn').textContent=''}})}
 $('q').oninput=()=>{clearTimeout(dtm);dtm=setTimeout(dp,SHEET_URL?350:0)};dp();
 
 /* ---------- Shop: no prices, order via WhatsApp ---------- */

@@ -4,7 +4,7 @@ body{margin:0;background:var(--bg);color:var(--cr);font:500 17px/1.5 'Barlow Con
 h1,h2,h3{font-family:Cinzel,Georgia,serif;margin:0;font-weight:700}
 a{color:inherit;text-decoration:none}
 nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;display:flex;gap:20px;align-items:center;padding:12px 5vw;background:#07060acc;backdrop-filter:blur(10px);border-bottom:1px solid var(--ln);flex-wrap:wrap}
-nav b{font:700 18px Cinzel,serif;color:var(--br);margin-right:auto;letter-spacing:.12em}
+nav .brand{display:flex;align-items:center;gap:10px;margin-right:auto;min-width:0}nav .brand img{width:48px;height:48px;object-fit:contain;border-radius:50%;border:1px solid var(--br)}nav b{font:700 18px Cinzel,serif;color:var(--br);letter-spacing:.08em}
 nav a{color:var(--mu);text-transform:uppercase;letter-spacing:.15em;font-size:14px}nav a:hover{color:var(--em)}
 .btn{display:inline-block;border:0;cursor:pointer;padding:13px 28px;font:700 15px 'Barlow Condensed';letter-spacing:.18em;text-transform:uppercase;color:#120a02;background:linear-gradient(135deg,#f1d38a,var(--br) 50%,#a07a2a);clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%)}
 .btn.g{background:none;color:var(--br);box-shadow:inset 0 0 0 1.5px var(--br)}
@@ -13,7 +13,7 @@ nav a{color:var(--mu);text-transform:uppercase;letter-spacing:.15em;font-size:14
 .road::before{content:"";position:absolute;left:49.2%;width:1.6%;top:0;bottom:0;background:repeating-linear-gradient(to bottom,var(--br) 0 38px,transparent 38px 90px);animation:mv .6s linear infinite}
 @keyframes mv{to{background-position:0 90px}}
 .beam{position:absolute;left:50%;bottom:0;width:140%;height:80%;transform:translateX(-50%);background:conic-gradient(from 160deg at 50% 100%,transparent 0 10deg,#ffd9a022 25deg,#ffd9a008 45deg,transparent 60deg);pointer-events:none}
-.hero .c{position:relative;z-index:2;max-width:980px}
+.hero .c{position:relative;z-index:2;max-width:980px}.hero-logo{position:relative;z-index:2;width:clamp(120px,20vw,210px);height:auto;border-radius:50%;border:2px solid #d6ad57;box-shadow:0 0 40px #ff6a1330;margin-bottom:22px}
 .eye{letter-spacing:.5em;color:var(--em);text-transform:uppercase;font-size:14px}
 .hero h1{font-size:clamp(56px,13vw,170px);line-height:.88;margin:10px 0;background:linear-gradient(#fff3d6,var(--br) 55%,#7a5a1a);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 6px 30px #000)}
 .hero p{max-width:600px;margin:14px auto;font-size:20px;color:#e5d9c2}
@@ -105,9 +105,13 @@ dialog{max-height:92vh;max-height:92svh;overflow:auto;-webkit-overflow-scrolling
 .rc{display:flex;flex-direction:column;gap:8px}.ct{display:flex;gap:8px;flex-wrap:wrap}
 @media(max-width:700px){
  nav{flex-wrap:nowrap;justify-content:space-between;overflow:visible;white-space:normal;gap:0;padding:10px 14px}
- nav b{margin-right:0;font-size:15px}
+ nav .brand{gap:7px;margin-right:8px;flex:1}nav .brand img{width:38px;height:38px}nav b{font-size:clamp(11px,3.1vw,15px);letter-spacing:.03em}
  .bg{display:block;background:none;border:1px solid var(--br);color:var(--br);font-size:22px;line-height:1;width:46px;height:44px;border-radius:8px;cursor:pointer}
  .nl{display:none;position:absolute;top:100%;left:0;right:0;background:#07060af8;border-bottom:1px solid var(--ln);padding:4px 16px 14px;flex-direction:column}
  nav.open .nl{display:flex}
  .nl a{padding:15px 4px;font-size:17px;border-bottom:1px solid var(--ln)}.nl a:last-child{border-bottom:0}
 }
+
+/* Brand logo and mobile layout */
+.brand:focus-visible,.nl a:focus-visible{outline:2px solid var(--br);outline-offset:3px}
+@media(max-width:380px){nav .brand img{width:32px;height:32px}.hero-logo{width:130px}}

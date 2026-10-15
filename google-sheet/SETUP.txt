@@ -8,6 +8,7 @@ Your Web app URL is already in js/main.js (SHEET_URL). Do NOT change it. Only up
 4. Deploy > Manage deployments > pencil (Edit) > Version: "New version" > Deploy.  (Skipping this = old code keeps running.)
 5. Test in a browser:  <Web app URL>?a=debug   and   <Web app URL>?a=riders   and   <Web app URL>?a=rides
 6. Clear the old TEST rows from Riders and Ride Registrations (the columns changed: UTR / screenshot columns are gone).
+7. Check <Web app URL>?a=debug. Confirm upcomingTabUsed is exactly "Upcoming Rides", columnMap.fee is a number (0 or higher), and sampleFeeValues contains your configured fees. If it is -1, rename the header to "Fee (₹)" or "Fee (Rs)" and deploy a New version.
 
 TABS AND COLUMNS
 Riders              : Timestamp, Name, WhatsApp, Email, Date of birth, Profession, Bike model, Bike number, Membership, Fee, Registration type, Payment received, Show on website
@@ -29,7 +30,7 @@ RIDER DIRECTORY ON THE WEBSITE (Riders tab)
 UPCOMING RIDES TAB
 - One row per ride. Fee (Rs) = charge per rider (breakfast / lunch). Write 0 for a free ride. If the Fee cell is EMPTY the site shows "Fee: to be confirmed".
 - Includes = text on the card, e.g. "Breakfast + Lunch". Write "No" in Show on website to hide a ride. Past rides hide automatically.
-- If every ride shows "Free ride" or "to be confirmed", the Fee column is empty or the script was not deployed as a New version.
+- If every ride shows "Free ride" or "to be confirmed", check ?a=debug first: columnMap.fee must not be -1 and sampleFeeValues should contain the fee values. Then redeploy Apps Script as a New version and hard-refresh the site (Ctrl+F5).
 
 IF SOMETHING LOOKS WRONG
 - <Web app URL>?a=debug shows the tab names, the tab used for rides and riders, headings and counts.
@@ -37,3 +38,12 @@ IF SOMETHING LOOKS WRONG
 
 PRIVACY
 Keep the sheet private (it holds phone numbers, emails and birth dates). Collect details only with consent.
+
+
+RIDE FEE TROUBLESHOOTING (updated)
+- The website reads rides only from the tab named Upcoming Rides (or a tab name beginning with Upcoming).
+- The fee header can be Fee, Fee (₹), Ride Fee(s), Rider Fee(s), Registration Fee, Entry Fee, Charge, Price, Cost, or Amount (Rs.). Keep one clear fee header in row 1.
+- The fee must be in the same ride row as the ride name. Numeric values such as 250 or formatted values such as ₹1,200 are supported. A blank fee is shown as “Fee: to be confirmed”; an explicit 0 is shown as “Free ride”.
+- After replacing Code.gs, run setup() once if needed, then Deploy > Manage deployments > Edit > New version > Deploy. Reusing the same /exec URL is fine.
+- Check /exec?a=debug. It now returns feeHeader and sampleFeeValues (raw, displayed, parsed) so you can verify what the script is reading.
+- Riders: Show on website must be Yes. Empty search returns the first 10 approved riders. Partial name/bike/number searches are supported while typing; phone matching works with two or more digits.
