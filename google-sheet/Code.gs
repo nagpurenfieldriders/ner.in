@@ -64,24 +64,45 @@ function doPost(e) {
   }
 }
 
-// Website calls  <web app URL>?a=rides  when the page loads.
+// Website calls  <web app URL>?a=rides&tab=Upcoming Rides   when the page loads.
+// Diagnose with   <web app URL>?a=debug   (shows tab names, which tab is used, its headings and row count).
 function doGet(e) {
-  if (e && e.parameter && e.parameter.a === 'rides') return out_({ ok: true, rides: rides_() });
+  const p = (e && e.parameter) || {};
+  if (p.a === 'rides') { const r = rides_(p.tab); return out_({ ok: true, tab: r.tab, rides: r.rides }); }
+  if (p.a === 'debug') {
+    const u = upcomingSheet_(p.tab);
+    return out_({ ok: true, tabs: SpreadsheetApp.openById(SHEET_ID).getSheets().map(s => s.getName()),
+      upcomingTabUsed: u ? u.getName() : null,
+      headers: u && u.getLastRow() > 0 ? u.getRange(1, 1, 1, u.getLastColumn()).getValues()[0] : [],
+      rows: u ? Math.max(u.getLastRow() - 1, 0) : 0 });
+  }
   return out_({ ok: true, msg: 'NER registration endpoint is live' });
 }
 
-function rides_() {
-  const sh = SpreadsheetApp.openById(SHEET_ID).getSheets().filter(s => match_('upcoming', s.getName()))[0];
-  if (!sh || sh.getLastRow() < 2) return [];
-  const v = sh.getDataRange().getValues(), h = v[0].map(x => String(x).toLowerCase());
-  const col = function () { for (let a = 0; a < arguments.length; a++) { const i = h.findIndex(x => x.indexOf(arguments[a]) > -1); if (i > -1) return i; } return -1; };
-  const c = { date: col('date'), name: col('ride name', 'name', 'ride'), route: col('route', 'destination'), dist: col('distance', 'km'), lvl: col('difficulty', 'level'), show: col('show', 'status') };
-  const g = (r, i) => (i > -1 && r[i] !== undefined) ? r[i] : '';
-  return v.slice(1).filter(r => String(g(r, c.name)).trim()).map(r => {
-    const d = g(r, c.date);
-    return { date: d instanceof Date ? Utilities.formatDate(d, 'Asia/Kolkata', 'yyyy-MM-dd') : String(d),
-             name: String(g(r, c.name)).trim(), route: String(g(r, c.route)), distance: String(g(r, c.dist)),
-             level: String(g(r, c.lvl)), show: String(g(r, c.show) || 'yes').toLowerCase() };
-  });
+// Only a tab named like "Upcoming Rides" can ever be read by the website (never Riders / Registrations / Orders).
+function upcomingSheet_(want) {
+  const all = SpreadsheetApp.openById(SHEET_ID).getSheets().filter(s => match_('upcoming', s.getName()));
+  const w = String(want || 'Upcoming Rides').trim().toLowerCase();
+  return all.filter(s => s.getName().trim().toLowerCase() === w)[0] || all[0];
 }
+
+function rides_(want) {
+  const sh = upcomingSheet_(want);
+  if (!sh) return { tab: null, rides: [] };
+  if (sh.getLastRow() < 2) return { tab: sh.getName(), rides: [] };
+  const v = sh.getDataRange().getValues(), h = v[0].map(x => String(x).trim().toLowerCase());
+  const has = (...ks) => { for (const k of ks) { const i = h.findIndex(x => x.indexOf(k) > -1); if (i > -1) return i; } return -1; };
+  const eq = (...ks) => { for (const k of ks) { const i = h.indexOf(k); if (i > -1) return i; } return -1; };
+  let c = { date: has('date', 'when'), name: has('ride name', 'name', 'title', 'ride'), route: has('route'), from: eq('from', 'start', 'start point'),
+            to: eq('to', 'end', 'destination'), dist: has('distance', 'km'), lvl: has('difficulty', 'level'), show: has('show', 'status', 'visible') };
+  if (c.date < 0) c.date = 0;
+  if (c.name < 0) c.name = c.date === 0 ? 1 : 0;
+  const g = (r, i) => (i > -1 && r[i] !== undefined) ? r[i] : '';
+  return { tab: sh.getName(), rides: v.slice(1).filter(r => String(g(r, c.name)).trim()).map(r => {
+    const d = g(r, c.date), route = c.route > -1 ? String(g(r, c.route)) : [g(r, c.from), g(r, c.to)].filter(String).join(' to ');
+    return { date: d instanceof Date ? Utilities.formatDate(d, 'Asia/Kolkata', 'yyyy-MM-dd') : String(d), name: String(g(r, c.name)).trim(), route: route,
+             distance: String(g(r, c.dist)), level: String(g(r, c.lvl)), show: String(g(r, c.show) || 'yes').toLowerCase() };
+  }) };
+}
+
 function out_(o) { return ContentService.createTextOutput(JSON.stringify(o)).setMimeType(ContentService.MimeType.JSON); }

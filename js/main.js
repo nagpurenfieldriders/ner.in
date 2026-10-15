@@ -17,11 +17,18 @@ cs.querySelectorAll('.node').forEach(n=>{const f=()=>{const d=DEST[n.dataset.i];
 
 /* Rides + gallery */
 let RIDES=[["12","NOV","Sunday Dawn Run","NAGPUR → RAMTEK","60 km · Easy"],["29","NOV","Pench Jungle Ride","NAGPUR → PENCH","90 km · Moderate"],["20","DEC","Winter Tour","NAGPUR → TADOBA","150 km · Moderate"]];
-function renderRides(){$('tix').innerHTML=RIDES.length?RIDES.map(r=>`<div class="tk"><div class="m"><small>Boarding pass · Gate: Zero Mile</small><h3>${r[2]}</h3><div class="route">${r[3]}</div><p style="color:var(--mu);margin:6px 0 12px">${r[4]}</p><button class="btn g" style="padding:8px 18px" onclick="openRide(${RIDES.indexOf(r)})">Register for ride</button></div><div class="s"><div><b>${r[0]}</b><br><small>${r[1]}</small></div></div></div>`).join(''):'<p class="sub">No upcoming rides announced yet. Check back soon.</p>'}
+let loadState=SHEET_URL?1:0;if(SHEET_URL)RIDES=[]; /* with a sheet connected, never show sample rides */
+function renderRides(){$('tix').innerHTML=RIDES.length?RIDES.map(r=>`<div class="tk"><div class="m"><small>Boarding pass · Gate: Zero Mile</small><h3>${r[2]}</h3><div class="route">${r[3]}</div><p style="color:var(--mu);margin:6px 0 12px">${r[4]}</p><button class="btn g" style="padding:8px 18px" onclick="openRide(${RIDES.indexOf(r)})">Register for ride</button></div><div class="s"><div><b>${r[0]}</b><br><small>${r[1]}</small></div></div></div>`).join(''):'<p class="sub">'+(loadState?'Loading upcoming rides…':'No upcoming rides announced yet. Check back soon.')+'</p>'}
 renderRides();
-/* Upcoming rides come from the "Upcoming Rides" tab of the Google Sheet (falls back to the samples above) */
-if(SHEET_URL)fetch(SHEET_URL+'?a=rides',{cache:'no-store'}).then(r=>r.json()).then(j=>{if(!j||!j.ok||!Array.isArray(j.rides))return;const M=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'],t0=new Date();t0.setHours(0,0,0,0);
- RIDES=j.rides.filter(r=>!/^(no|n|false|hide|hidden|closed|cancelled)$/.test((r.show||'yes').trim())).map(r=>{const d=new Date(r.date);const ok=!isNaN(d);return{d:ok?d:null,a:ok?[String(d.getDate()),M[d.getMonth()]]:[(r.date||'TBA').slice(0,6),''],r:[...[],0,0,r.name,(r.route||'').toUpperCase(),[r.distance?(/km/i.test(r.distance)?r.distance:r.distance+' km'):'',r.level].filter(Boolean).join(' · ')]}}).filter(x=>!x.d||x.d>=t0).sort((a,b)=>(a.d||0)-(b.d||0)).map(x=>[x.a[0],x.a[1],x.r[2],x.r[3],x.r[4]]);renderRides()}).catch(()=>{});
+/* Upcoming rides come ONLY from the "Upcoming Rides" tab of the Google Sheet */
+const RIDES_TAB='Upcoming Rides';
+const pd=s=>{const x=/^(\d{4})-(\d{2})-(\d{2})$/.exec(String(s).trim());return x?new Date(+x[1],+x[2]-1,+x[3]):new Date(s)};
+if(SHEET_URL)fetch(SHEET_URL+'?a=rides&tab='+encodeURIComponent(RIDES_TAB),{cache:'no-store'}).then(r=>r.json()).then(j=>{
+ if(!j||!j.ok||!Array.isArray(j.rides)){console.warn('NER: Apps Script is an old version (no rides support). Paste the latest Code.gs and deploy a New version.',j);loadState=0;renderRides();return}
+ console.info('NER: rides loaded from tab "'+j.tab+'" ('+j.rides.length+' rows)');
+ const M=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'],t0=new Date();t0.setHours(0,0,0,0);
+ RIDES=j.rides.filter(r=>!/^(no|n|false|hide|hidden|closed|cancelled|canceled|completed|done)$/.test((r.show||'yes').trim())).map(r=>({d:isNaN(pd(r.date))?null:pd(r.date),date:r.date,r})).filter(x=>!x.d||x.d>=t0).sort((a,b)=>(a.d||1e15)-(b.d||1e15)).map(x=>{const r=x.r;return[x.d?String(x.d.getDate()):(x.date||'TBA').slice(0,6),x.d?M[x.d.getMonth()]:'',r.name,(r.route||'').toUpperCase(),[r.distance?(/km/i.test(r.distance)?r.distance:r.distance+' km'):'',r.level].filter(Boolean).join(' · ')]});
+ loadState=0;renderRides()}).catch(e=>{console.warn('NER: could not load rides from the sheet',e);loadState=0;renderRides()});
 const G=["#7a2d0a,#1a0b04","#d6ad57,#3a2a0a","#ff6a13,#2a0f05","#5b3a1e,#0d0906"];
 $('film').innerHTML=Array.from({length:8},(_,i)=>`<div class="fr" style="background:linear-gradient(135deg,${G[i%4]})">FRAME ${String(i+1).padStart(2,'0')} · your ride photo</div>`).join('');
 

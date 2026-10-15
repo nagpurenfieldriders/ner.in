@@ -25,3 +25,10 @@ UPCOMING RIDES TAB (shown on the website when the page loads)
 - Type the date as a normal date. Past rides are hidden automatically. Write "No" in the last column to hide a ride.
 - Changes appear on the website the next time the page loads (no re-upload needed).
 - IMPORTANT: after pasting the new Code.gs, use Deploy > Manage deployments > Edit > New version, so the same Web app URL gets the update.
+
+IF RIDES LOOK WRONG (checking in 1 minute)
+- Open  <your Web app URL>?a=debug  in a browser. It shows: all tab names, which tab is used for rides ("upcomingTabUsed"), its headings and row count.
+  upcomingTabUsed must be "Upcoming Rides". If you only see {"ok":true,"msg":...} the Web app still runs the OLD code:
+  paste the latest Code.gs and use Deploy > Manage deployments > Edit > New version.
+- Open  <your Web app URL>?a=rides  to see exactly what the website receives.
+- Press Ctrl+F5 on the website after any change. The browser console (F12) prints which tab the rides were loaded from.
