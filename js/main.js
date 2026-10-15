@@ -1,5 +1,7 @@
 const $=i=>document.getElementById(i);
 const WA='919028267858';
+const SHEET_URL='https://docs.google.com/spreadsheets/d/12bQwYDuYjBnRultp3JnHDaVY11yl_kZg5eR86XKSdQM/edit?gid=1950325120#gid=1950325120'; /* paste your Google Apps Script Web app URL here (see google-sheet/SETUP.txt) */
+const logSheet=o=>{if(!SHEET_URL)return;try{fetch(SHEET_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(o)}).catch(()=>{})}catch(e){}};
 const send=m=>window.open('https://wa.me/'+WA+'?text='+encodeURIComponent(m),'_blank');
 const dg=v=>v.replace(/\D/g,'').slice(0,10),okP=v=>/^[6-9]\d{9}$/.test(v);
 const vn=v=>v.toUpperCase().replace(/[^A-Z0-9 ]/g,'').slice(0,13);
@@ -14,8 +16,12 @@ cs.innerHTML=h;
 cs.querySelectorAll('.node').forEach(n=>{const f=()=>{const d=DEST[n.dataset.i];cs.querySelectorAll('.on').forEach(e=>e.classList.remove('on'));n.classList.add('on');$('sp'+n.dataset.i).classList.add('on');$('ci').innerHTML=`<h3>Nagpur → ${d[0]}</h3><p style="font-size:44px;font-family:Cinzel;color:var(--br);margin:6px 0">~${d[2].toLocaleString('en-IN')} km</p><p>${d[3]}</p><a class="btn" href="#rides">See rides</a>`};n.onmouseenter=n.onclick=f});
 
 /* Rides + gallery */
-const RIDES=[["12","NOV","Sunday Dawn Run","NAGPUR → RAMTEK","60 km · Easy"],["29","NOV","Pench Jungle Ride","NAGPUR → PENCH","90 km · Moderate"],["20","DEC","Winter Tour","NAGPUR → TADOBA","150 km · Moderate"]];
-$('tix').innerHTML=RIDES.map(r=>`<div class="tk"><div class="m"><small>Boarding pass · Gate: Zero Mile</small><h3>${r[2]}</h3><div class="route">${r[3]}</div><p style="color:var(--mu);margin:6px 0 12px">${r[4]}</p><button class="btn g" style="padding:8px 18px" onclick="openRide(${RIDES.indexOf(r)})">Register for ride</button></div><div class="s"><div><b>${r[0]}</b><br><small>${r[1]}</small></div></div></div>`).join('');
+let RIDES=[["12","NOV","Sunday Dawn Run","NAGPUR → RAMTEK","60 km · Easy"],["29","NOV","Pench Jungle Ride","NAGPUR → PENCH","90 km · Moderate"],["20","DEC","Winter Tour","NAGPUR → TADOBA","150 km · Moderate"]];
+function renderRides(){$('tix').innerHTML=RIDES.length?RIDES.map(r=>`<div class="tk"><div class="m"><small>Boarding pass · Gate: Zero Mile</small><h3>${r[2]}</h3><div class="route">${r[3]}</div><p style="color:var(--mu);margin:6px 0 12px">${r[4]}</p><button class="btn g" style="padding:8px 18px" onclick="openRide(${RIDES.indexOf(r)})">Register for ride</button></div><div class="s"><div><b>${r[0]}</b><br><small>${r[1]}</small></div></div></div>`).join(''):'<p class="sub">No upcoming rides announced yet. Check back soon.</p>'}
+renderRides();
+/* Upcoming rides come from the "Upcoming Rides" tab of the Google Sheet (falls back to the samples above) */
+if(SHEET_URL)fetch(SHEET_URL+'?a=rides',{cache:'no-store'}).then(r=>r.json()).then(j=>{if(!j||!j.ok||!Array.isArray(j.rides))return;const M=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'],t0=new Date();t0.setHours(0,0,0,0);
+ RIDES=j.rides.filter(r=>!/^(no|n|false|hide|hidden|closed|cancelled)$/.test((r.show||'yes').trim())).map(r=>{const d=new Date(r.date);const ok=!isNaN(d);return{d:ok?d:null,a:ok?[String(d.getDate()),M[d.getMonth()]]:[(r.date||'TBA').slice(0,6),''],r:[...[],0,0,r.name,(r.route||'').toUpperCase(),[r.distance?(/km/i.test(r.distance)?r.distance:r.distance+' km'):'',r.level].filter(Boolean).join(' · ')]}}).filter(x=>!x.d||x.d>=t0).sort((a,b)=>(a.d||0)-(b.d||0)).map(x=>[x.a[0],x.a[1],x.r[2],x.r[3],x.r[4]]);renderRides()}).catch(()=>{});
 const G=["#7a2d0a,#1a0b04","#d6ad57,#3a2a0a","#ff6a13,#2a0f05","#5b3a1e,#0d0906"];
 $('film').innerHTML=Array.from({length:8},(_,i)=>`<div class="fr" style="background:linear-gradient(135deg,${G[i%4]})">FRAME ${String(i+1).padStart(2,'0')} · your ride photo</div>`).join('');
 
@@ -26,6 +32,7 @@ $('rp').oninput=e=>e.target.value=dg(e.target.value);
 $('rv').oninput=e=>e.target.value=vn(e.target.value);
 $('rf').onsubmit=e=>{e.preventDefault();const n=$('rn').value.trim(),p=$('rp').value,r=RIDES[cr];
  if(n.length<2||!okP(p)){$('re').textContent='Enter your name and a valid 10-digit WhatsApp number.';return}
+ logSheet({type:'ride',ride:r[2],date:r[0]+' '+r[1],route:r[3],name:n,phone:'+91'+p,bike:$('rb').value,bikeNo:$('rv').value,count:$('rq').value||1,note:$('rc').value.trim()});
  send(`*Ride registration - Nagpur Enfield Riders*\nRide: ${r[2]} (${r[0]} ${r[1]}, ${r[3]})\nRider: ${n}\nWhatsApp: +91${p}\nBike: ${$('rb').value||'-'}\nBike number: ${$('rv').value||'-'}\nRiders (with pillion): ${$('rq').value||1}\nNote: ${$('rc').value.trim()||'-'}`);$('rd').close()};
 
 /* Join / licence form */
@@ -37,22 +44,27 @@ $('tiers').innerHTML=TIERS.map((t,i)=>`<div class="tr${i?'':' on'}" data-i="${i}
 document.querySelectorAll('.tr').forEach(e=>e.onclick=()=>{document.querySelectorAll('.tr').forEach(x=>x.classList.remove('on'));e.classList.add('on');tier=TIERS[e.dataset.i];up()});
 function up(){const v=$('in').value.trim();$('ln').textContent=(v||'YOUR NAME').toUpperCase();$('lp').textContent=($('pf').value.trim()||'PROFESSION').toUpperCase();$('lb').textContent=($('bike').value||'YOUR BIKE').toUpperCase()+($('bn').value?' · '+$('bn').value:'');$('lno').textContent='+91 '+($('ph').value||'XXXXXXXXXX');$('lt').textContent=tier.n.toUpperCase()}
 ['in','pf','bike','bn','ph'].forEach(i=>$(i).addEventListener('input',()=>{if(i=='ph')$(i).value=dg($(i).value);if(i=='bn')$(i).value=vn($(i).value);up()}));
-$('jf').onsubmit=e=>{e.preventDefault();const n=$('in').value.trim(),p=$('ph').value;
+$('db').max=new Date().toISOString().slice(0,10);
+$('jf').onsubmit=e=>{e.preventDefault();const n=$('in').value.trim(),p=$('ph').value,em=$('em').value.trim(),db=$('db').value;
  if(n.length<2||!okP(p)){$('je').textContent='Enter your name and a valid 10-digit WhatsApp number.';return}
+ if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(em)){$('je').textContent='Enter a valid email address.';return}
+ if(!db||db>$('db').max||db<'1930-01-01'){$('je').textContent='Enter a valid date of birth.';return}
  $('je').textContent='';
- send(`*New rider join request - Nagpur Enfield Riders*\nName: ${n}\nWhatsApp: +91${p}\nProfession: ${$('pf').value.trim()||'-'}\nBike: ${$('bike').value||'-'}\nBike number: ${$('bn').value||'-'}\nMembership: ${tier.n} (${tier.fee})`)};
+ logSheet({type:'rider',name:n,phone:'+91'+p,email:em,dob:db,profession:$('pf').value.trim(),bike:$('bike').value,bikeNo:$('bn').value,membership:tier.n,fee:tier.fee});
+ send(`*New rider join request - Nagpur Enfield Riders*\nName: ${n}\nWhatsApp: +91${p}\nEmail: ${em}\nDate of birth: ${db}\nProfession: ${$('pf').value.trim()||'-'}\nBike: ${$('bike').value||'-'}\nBike number: ${$('bn').value||'-'}\nMembership: ${tier.n} (${tier.fee})`)};
 
 /* Directory */
 const R=[["Amit Deshmukh","Engineer","Classic 350","MH 31 XX 0001","Dharampeth"],["Rohan Meshram","Doctor","Himalayan 450","MH 31 XX 0002","Sitabuldi"],["Sneha Patil","Designer","Meteor 350","MH 31 XX 0003","Manish Nagar"],["Vikram Thakur","Business owner","Interceptor 650","MH 31 XX 0004","Sadar"],["Nikhil Wankhede","Photographer","Bullet 350","MH 31 XX 0005","Pratap Nagar"],["Pooja Kale","Teacher","Hunter 350","MH 31 XX 0006","Besa"]];
 function dp(){const q=$('q').value.toLowerCase();$('pl').innerHTML=R.filter(r=>r.join(' ').toLowerCase().includes(q)).map(r=>`<div class="plate"><i>IND</i><div><b>${r[3]}</b><span>${r[0]} · ${r[1]}<br>${r[2]} · ${r[4]}</span></div></div>`).join('')}$('q').oninput=dp;dp();
 
 /* Shop: no prices, order via WhatsApp */
-const S=[{n:"Zero Mile Tee",sz:1},{n:"Night Rider Hoodie",sz:1},{n:"Route Sticker Set",sz:0},{n:"Brass Key Ring",sz:0}];let cur=0;
-$('sh').innerHTML=S.map((s,i)=>`<div class="it"><div class="bd">ZERO<br>MILE</div><h3 style="font-size:20px">${s.n}</h3><p style="color:var(--mu);margin:6px 0 12px">${s.sz?'Sizes S to XXL':'One size'}</p><button class="btn" style="padding:9px 24px" onclick="oo_(${i})">Order</button></div>`).join('');
-function oo_(i){cur=i;$('oi').textContent=S[i].n;$('osw').style.display=S[i].sz?'':'none';$('oe').textContent='';$('od').showModal()}
+const S=[{n:"Zero Mile Tee",sz:1,img:"images/merch/tee.svg"},{n:"Night Rider Hoodie",sz:1,img:"images/merch/hoodie.svg"},{n:"Route Sticker Set",sz:0,img:"images/merch/stickers.svg"},{n:"Brass Key Ring",sz:0,img:"images/merch/keyring.svg"}];let cur=0;
+$('sh').innerHTML=S.map((s,i)=>`<div class="it"><img class="mi" src="${s.img}" alt="${s.n}" onclick="oo_(${i})"><h3 style="font-size:20px">${s.n}</h3><p style="color:var(--mu);margin:6px 0 12px">${s.sz?'Sizes S to 4XL':'One size'}</p><button class="btn" style="padding:9px 24px" onclick="oo_(${i})">Order</button></div>`).join('');
+function oo_(i){cur=i;$('oimg').src=S[i].img;$('oimg').alt=S[i].n;$('oi').textContent=S[i].n;$('osw').style.display=S[i].sz?'':'none';$('oe').textContent='';$('od').showModal()}
 $('op').oninput=e=>e.target.value=dg(e.target.value);
 $('of').onsubmit=e=>{e.preventDefault();const n=$('on').value.trim(),p=$('op').value,it=S[cur];
  if(n.length<2||!okP(p)){$('oe').textContent='Enter your name and a valid 10-digit WhatsApp number.';return}
+ logSheet({type:'order',item:it.n,qty:$('oq').value||1,size:it.sz?$('os').value:'One size',name:n,phone:'+91'+p,note:$('oc').value.trim()});
  send(`*New merchandise order - Nagpur Enfield Riders*\nItem: ${it.n}\nQuantity: ${$('oq').value||1}\nSize: ${it.sz?$('os').value:'One size'}\nRider: ${n}\nWhatsApp: +91${p}\nNote: ${$('oc').value.trim()||'-'}`);$('od').close()};
 
 /* Tachometer */

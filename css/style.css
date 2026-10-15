@@ -63,7 +63,10 @@ dialog{background:var(--pn);color:var(--cr);border:1px solid var(--em);max-width
 footer{border-top:2px solid var(--em);background:#000;padding:44px 5vw 90px;color:var(--mu);font-size:15px}
 .dc{max-width:900px;border:1px dashed var(--ln);padding:14px;margin:16px 0}
 .rv{opacity:0;transform:translateY(30px);transition:1s}.rv.in{opacity:1;transform:none}
-@media(max-width:899px){.wa{display:flex;margin-bottom:12px}.wa span{padding:13px;background:#1a1510;border:1px solid var(--ln);border-right:0;color:var(--br);font-weight:700}.wa input{margin-bottom:0}
+.wa{display:flex;margin-bottom:12px}.wa span{padding:13px;background:#1a1510;border:1px solid var(--ln);border-right:0;color:var(--br);font-weight:700}.wa input{margin-bottom:0}
 select{width:100%;background:#0b0908;border:1px solid var(--ln);color:var(--cr);padding:13px;font:inherit;margin-bottom:12px}
 label{display:block;font-size:13px;letter-spacing:.15em;text-transform:uppercase;color:var(--mu);margin-bottom:4px}
 .lic .r{font-size:15px}
+
+.mi{width:100%;aspect-ratio:1;object-fit:cover;display:block;margin-bottom:12px;cursor:pointer;border:1px solid var(--ln)}
+.oimg{width:100%;max-height:220px;object-fit:contain;background:#0b0908;border:1px solid var(--ln);margin-bottom:12px;display:block}

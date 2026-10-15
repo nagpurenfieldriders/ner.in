@@ -1,0 +1,27 @@
+GOOGLE SHEET SETUP (about 5 minutes, one time)
+Sign in as nagpurenfieldrider@gmail.com (the account that owns your registration sheet).
+
+1. Open your registration sheet:
+   https://docs.google.com/spreadsheets/d/12bQwYDuYjBnRultp3JnHDaVY11yl_kZg5eR86XKSdQM/edit
+2. Menu: Extensions > Apps Script. Delete the sample code and paste everything from google-sheet/Code.gs. Click Save.
+3. Choose the function "setup" and click Run. Approve the permission prompt.
+   Your 3 tabs now get column headings and the names:
+   Riders, Ride Registrations, Merchandise Orders, and Upcoming Rides (with headings).
+   (If your tabs are already named like that, only the headings are added. Tabs that already have data are left untouched.)
+4. Click Deploy > New deployment > type "Web app".
+   Execute as: Me.   Who has access: Anyone.   Click Deploy and copy the Web app URL (ends with /exec).
+5. Open js/main.js and paste the URL between the quotes in:  const SHEET_URL='';
+6. Upload the site again. Do a test registration and check that a new row appears.
+
+NOTES
+- WhatsApp still opens for every registration. The sheet entry is saved in the background.
+- If you change Code.gs later: Deploy > Manage deployments > Edit > New version.
+- Keep the sheet private: it holds phone numbers, emails and birth dates. Collect them only with consent.
+
+UPCOMING RIDES TAB (shown on the website when the page loads)
+- Tab name: Upcoming Rides (create it, or let setup create it).
+- One row per ride. Columns: Date | Ride name | Route | Distance (km) | Difficulty | Show on website
+  Example: 2026-11-29 | Pench Jungle Ride | Nagpur to Pench | 90 | Moderate | Yes
+- Type the date as a normal date. Past rides are hidden automatically. Write "No" in the last column to hide a ride.
+- Changes appear on the website the next time the page loads (no re-upload needed).
+- IMPORTANT: after pasting the new Code.gs, use Deploy > Manage deployments > Edit > New version, so the same Web app URL gets the update.
